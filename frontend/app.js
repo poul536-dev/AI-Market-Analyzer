@@ -759,6 +759,10 @@ function updateMT5Status(data) {
     if (data.connected) {
         el.textContent = "CONECTADO";
         el.style.color = "var(--green)";
+    } else if (data.available === false) {
+        var src = (data.fallback_source || "brapi").toUpperCase();
+        el.textContent = "OFFLINE (" + src + ")";
+        el.style.color = "var(--yellow)";
     } else {
         el.textContent = "DESCONECTADO";
         el.style.color = "var(--red)";

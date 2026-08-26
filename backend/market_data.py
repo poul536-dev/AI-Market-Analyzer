@@ -376,7 +376,12 @@ class MarketDataService:
     def get_mt5_connection(self) -> dict:
         if self._mt5:
             return self._mt5.get_connection_info()
-        return {"connected": False, "error": "MT5 not available"}
+        return {
+            "connected": False,
+            "available": False,
+            "error": "MT5 not available (Linux/cloud server)",
+            "fallback_source": self.data_source,
+        }
 
     @property
     def data_source(self) -> str:
