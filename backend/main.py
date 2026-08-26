@@ -147,7 +147,9 @@ def _format_time(ts: float) -> str:
 
 
 def _market_status() -> str:
-    now = datetime.now()
+    from datetime import timezone, timedelta
+    tz_brt = timezone(timedelta(hours=-3))
+    now = datetime.now(tz_brt)
     hour = now.hour
     minute = now.minute
     t = hour * 100 + minute
