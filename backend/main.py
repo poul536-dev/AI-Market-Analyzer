@@ -117,6 +117,7 @@ app.add_middleware(
         "http://localhost:8000",
         "http://127.0.0.1:8000",
         "http://localhost:3000",
+        "https://ai-market-analyzer-production.up.railway.app",
         "https://ai-market-analyzer.up.railway.app",
     ],
     allow_origin_regex=r"^https://.*\.up\.railway\.app$",

@@ -10,7 +10,7 @@
         - For local testing on same WiFi: http://192.168.X.X:8000
         - For Android emulator: http://10.0.2.2:8000
     -->
-    <string name="server_url">https://ai-market-analyzer.up.railway.app</string>
+    <string name="server_url">https://ai-market-analyzer-production.up.railway.app</string>
 
     <!-- Error messages -->
     <string name="error_title">Sem conexao</string>
