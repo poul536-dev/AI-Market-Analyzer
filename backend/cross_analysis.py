@@ -19,6 +19,8 @@ class CrossAnalysis:
     wdo_pressure: str
     recommendation: str
     confidence: float
+    wdo_influence: float = 0.0
+    wdo_score: float = 50.0
 
 
 def _calc_correlation(win_closes: List[float], wdo_closes: List[float]) -> float:
@@ -170,6 +172,47 @@ def analyze_cross(win_candles: list, wdo_candles: list) -> dict:
     else:
         recommendation = "Mercado sem sinal claro. Aguardar convergencia."
 
+    wdo_score = 50.0
+    if rsi_wdo > 70:
+        wdo_score = 80.0
+    elif rsi_wdo > 60:
+        wdo_score = 65.0
+    elif rsi_wdo < 30:
+        wdo_score = 20.0
+    elif rsi_wdo < 40:
+        wdo_score = 35.0
+
+    if hist_wdo > 0 and hist_wdo > abs(hist_win) * 0.5:
+        wdo_score = min(90, wdo_score + 10)
+    elif hist_wdo < 0 and abs(hist_wdo) > abs(hist_win) * 0.5:
+        wdo_score = max(10, wdo_score - 10)
+
+    if wdo_trend == "ALTA":
+        wdo_score = min(85, wdo_score + 8)
+    elif wdo_trend == "BAIXA":
+        wdo_score = max(15, wdo_score - 8)
+
+    wdo_influence = 0.0
+    if divergence.startswith("DIVERGENCIA"):
+        if wdo_trend == "BAIXA" and win_trend == "ALTA":
+            wdo_influence = 8.0
+        elif wdo_trend == "ALTA" and win_trend == "BAIXA":
+            wdo_influence = -8.0
+    elif wdo_pressure.startswith("FORTE ALTA"):
+        wdo_influence = -5.0
+    elif wdo_pressure.startswith("FORTE BAIXA"):
+        wdo_influence = 5.0
+    elif wdo_pressure.startswith("MODERADA ALTA"):
+        wdo_influence = -3.0
+    elif wdo_pressure.startswith("MODERADA BAIXA"):
+        wdo_influence = 3.0
+
+    if corr_label.startswith("FORTE POS") and wdo_trend == win_trend:
+        if wdo_trend == "ALTA":
+            wdo_influence += 4.0
+        elif wdo_trend == "BAIXA":
+            wdo_influence -= 4.0
+
     return {
         "correlation": corr_label,
         "correlation_score": round(corr, 4),
@@ -186,4 +229,6 @@ def analyze_cross(win_candles: list, wdo_candles: list) -> dict:
         "rsi_wdo": rsi_wdo,
         "macd_win_hist": hist_win,
         "macd_wdo_hist": hist_wdo,
+        "wdo_influence": round(wdo_influence, 1),
+        "wdo_score": round(wdo_score, 1),
     }

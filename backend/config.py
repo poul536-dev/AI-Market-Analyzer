@@ -31,6 +31,7 @@ class ScoreWeights:
     recent_price: float = 0.18
     tick_momentum: float = 0.22
     price_velocity: float = 0.10
+    wdo: float = 0.15
 
 
 @dataclass

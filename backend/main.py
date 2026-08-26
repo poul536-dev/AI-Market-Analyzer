@@ -219,8 +219,28 @@ def get_analise():
     output = {}
     current_prices = {}
 
+    win_analysis = results.get("WIN")
+    wdo_analysis = results.get("WDO")
+
+    cross_data = {}
+    win_influence = 0.0
+    wdo_influence_on_win = 0.0
+    wdo_score_val = 50.0
+
+    if win_analysis and wdo_analysis:
+        win_candles = market_service.get_asset_data("WIN").get("candles", [])
+        wdo_candles = market_service.get_asset_data("WDO").get("candles", [])
+        if win_candles and wdo_candles:
+            from cross_analysis import analyze_cross
+            cross_data = analyze_cross(win_candles, wdo_candles)
+            wdo_influence_on_win = cross_data.get("wdo_influence", 0.0)
+            wdo_score_val = cross_data.get("wdo_score", 50.0)
+
     for asset_name, analysis in results.items():
-        score = calculate_score(analysis)
+        if asset_name == "WIN":
+            score = calculate_score(analysis, wdo_influence=wdo_influence_on_win, wdo_score=wdo_score_val)
+        else:
+            score = calculate_score(analysis)
         prob = calculate_probability(analysis, score)
         ind = analysis.indicators
         sr = ind.sr
@@ -267,6 +287,8 @@ def get_analise():
             "recent_momentum": analysis.recent_momentum,
             "tick_momentum": analysis.tick_momentum,
             "price_velocity": analysis.price_velocity,
+            "wdo_influence": round(wdo_influence_on_win, 1),
+            "wdo_score": round(wdo_score_val, 1),
             "suporte_1": sr.get("support_1", 0),
             "suporte_2": sr.get("support_2", 0),
             "resistencia_1": sr.get("resist_1", 0),

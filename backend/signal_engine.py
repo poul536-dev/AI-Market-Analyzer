@@ -265,7 +265,7 @@ def _score_price_velocity(analysis: AssetAnalysis) -> float:
     return 50.0
 
 
-def calculate_score(analysis: AssetAnalysis) -> ScoreResult:
+def calculate_score(analysis: AssetAnalysis, wdo_influence: float = 0.0, wdo_score: float = 50.0) -> ScoreResult:
     w = settings.score_weights
 
     components = {
@@ -302,7 +302,9 @@ def calculate_score(analysis: AssetAnalysis) -> ScoreResult:
         + components["price_velocity"] * getattr(w, "price_velocity", 0.10)
     )
 
-    total = max(0, min(100, round(total_raw)))
+    wdo_weight = getattr(w, "wdo", 0.15)
+    total_raw_with_wdo = total_raw + wdo_influence + (wdo_score - 50) * wdo_weight
+    total = max(0, min(100, round(total_raw_with_wdo)))
 
     if total <= 20:
         label = "VENDA MUITO FORTE"
