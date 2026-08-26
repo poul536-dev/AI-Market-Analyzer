@@ -28,6 +28,7 @@ def minify_css(code: str) -> str:
 
 
 def build():
+    existing_apks = list(BUILD.glob("*.apk"))
     BUILD.mkdir(exist_ok=True)
     BUILD.mkdir(exist_ok=True, parents=True)
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+from pathlib import Path
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -831,6 +832,24 @@ async def auth_middleware(request: Request, call_next):
 
 
 app.mount("/static", StaticFiles(directory="../build", html=True), name="static")
+
+
+@app.get("/download/apk")
+async def download_apk():
+    from fastapi.responses import FileResponse
+    search_paths = [
+        Path(__file__).resolve().parent.parent / "build" / "AI-Market-Analyzer.apk",
+        Path(__file__).resolve().parent.parent / "AI-Market-Analyzer.apk",
+        Path(__file__).resolve().parent.parent / "downloads" / "AI-Market-Analyzer.apk",
+    ]
+    for p in search_paths:
+        if p.exists():
+            return FileResponse(
+                path=str(p),
+                filename="AI-Market-Analyzer.apk",
+                media_type="application/vnd.android.package-archive",
+            )
+    return JSONResponse(status_code=404, content={"error": "APK not found"})
 
 
 @app.get("/noticias")
