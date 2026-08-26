@@ -9,7 +9,7 @@ load_dotenv(_env_path)
 
 @dataclass
 class MT5Config:
-    path: str = r"C:\Program Files MetaTrader 5 Terminal\terminal64.exe"
+    path: str = r"C:\Program Files\MetaTrader 5 Terminal\terminal64.exe"
     login: int = int(os.environ.get("MT5_LOGIN", "0"))
     server: str = os.environ.get("MT5_SERVER", "")
     password: str = os.environ.get("MT5_PASSWORD", "")
