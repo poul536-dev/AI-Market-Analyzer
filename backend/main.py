@@ -265,6 +265,8 @@ def get_analise():
             "atr": ind.atr,
             "recent_change_pct": analysis.recent_change_pct,
             "recent_momentum": analysis.recent_momentum,
+            "tick_momentum": analysis.tick_momentum,
+            "price_velocity": analysis.price_velocity,
             "suporte_1": sr.get("support_1", 0),
             "suporte_2": sr.get("support_2", 0),
             "resistencia_1": sr.get("resist_1", 0),

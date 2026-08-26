@@ -249,9 +249,9 @@ class MT5Source:
             return None
 
         symbol = self._resolve_symbol(asset)
-        candles = self.get_candles(asset, "M5", 200)
+        candles = self.get_candles(asset, "M1", 100)
         if not candles:
-            candles = self.get_candles(asset, "D1", 200)
+            candles = self.get_candles(asset, "M5", 100)
         if not candles:
             return None
 

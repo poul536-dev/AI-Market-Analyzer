@@ -230,6 +230,41 @@ def _score_recent_price(analysis: AssetAnalysis) -> float:
     return 50.0
 
 
+def _score_tick_momentum(analysis: AssetAnalysis) -> float:
+    tm = analysis.tick_momentum
+    if tm >= 80:
+        return 85.0
+    elif tm >= 70:
+        return 70.0
+    elif tm >= 60:
+        return 60.0
+    elif tm <= 20:
+        return 15.0
+    elif tm <= 30:
+        return 30.0
+    elif tm <= 40:
+        return 40.0
+    return 50.0
+
+
+def _score_price_velocity(analysis: AssetAnalysis) -> float:
+    v = analysis.price_velocity
+    tick = 5.0 if "WIN" in analysis.asset.upper() else 0.50
+    if v > tick * 3:
+        return 85.0
+    elif v > tick * 2:
+        return 75.0
+    elif v > tick:
+        return 65.0
+    elif v < -tick * 3:
+        return 15.0
+    elif v < -tick * 2:
+        return 25.0
+    elif v < -tick:
+        return 35.0
+    return 50.0
+
+
 def calculate_score(analysis: AssetAnalysis) -> ScoreResult:
     w = settings.score_weights
 
@@ -246,6 +281,8 @@ def calculate_score(analysis: AssetAnalysis) -> ScoreResult:
         "stochastic": round(_score_stochastic(analysis), 1),
         "bollinger": round(_score_bollinger(analysis), 1),
         "recent_price": round(_score_recent_price(analysis), 1),
+        "tick_momentum": round(_score_tick_momentum(analysis), 1),
+        "price_velocity": round(_score_price_velocity(analysis), 1),
     }
 
     total_raw = (
@@ -260,25 +297,27 @@ def calculate_score(analysis: AssetAnalysis) -> ScoreResult:
         + components["adx"] * w.adx
         + components["stochastic"] * w.stochastic
         + components["bollinger"] * w.bollinger
-        + components["recent_price"] * getattr(w, "recent_price", 0.10)
+        + components["recent_price"] * getattr(w, "recent_price", 0.18)
+        + components["tick_momentum"] * getattr(w, "tick_momentum", 0.22)
+        + components["price_velocity"] * getattr(w, "price_velocity", 0.10)
     )
 
     total = max(0, min(100, round(total_raw)))
 
     if total <= 20:
         label = "VENDA MUITO FORTE"
-    elif total <= 40:
+    elif total <= 38:
         label = "VENDA"
-    elif total <= 49:
+    elif total <= 47:
         label = "NEUTRO"
-    elif total <= 65:
+    elif total <= 62:
         label = "COMPRA"
     else:
         label = "COMPRA MUITO FORTE"
 
-    if total >= 55:
+    if total >= 52:
         force = "COMPRADORA"
-    elif total <= 45:
+    elif total <= 48:
         force = "VEDORA"
     else:
         force = "NEUTRA"

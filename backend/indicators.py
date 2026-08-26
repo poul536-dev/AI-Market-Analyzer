@@ -135,8 +135,8 @@ def calc_support_resistance(candles: list) -> dict:
     highs = [c.high for c in candles]
     lows = [c.low for c in candles]
 
-    day_high = max(highs[-60:]) if len(highs) >= 60 else max(highs)
-    day_low = min(lows[-60:]) if len(lows) >= 60 else min(lows)
+    day_high = max(highs[-20:]) if len(highs) >= 20 else max(highs)
+    day_low = min(lows[-20:]) if len(lows) >= 20 else min(lows)
     open_price = closes[0] if closes else 0.0
     current = closes[-1] if closes else 0.0
 
@@ -162,7 +162,7 @@ def calc_support_resistance(candles: list) -> dict:
     }
 
 
-def calc_atr(candles: list, period: int = 14) -> float:
+def calc_atr(candles: list, period: int = 7) -> float:
     if len(candles) < period + 1:
         return 0.0
     trs = []
@@ -180,7 +180,7 @@ def calc_atr(candles: list, period: int = 14) -> float:
     return round(atr, 2)
 
 
-def calc_adx(candles: list, period: int = 14) -> dict:
+def calc_adx(candles: list, period: int = 7) -> dict:
     if len(candles) < period * 2:
         return {"adx": 0.0, "plus_di": 0.0, "minus_di": 0.0, "trend_strength": "FRACO"}
 
@@ -258,7 +258,7 @@ def calc_adx(candles: list, period: int = 14) -> dict:
     }
 
 
-def calc_stochastic(candles: list, k_period: int = 14, d_period: int = 3) -> dict:
+def calc_stochastic(candles: list, k_period: int = 7, d_period: int = 3) -> dict:
     if len(candles) < k_period:
         return {"k": 50.0, "d": 50.0, "signal": "NEUTRO"}
 
@@ -300,7 +300,7 @@ def calc_stochastic(candles: list, k_period: int = 14, d_period: int = 3) -> dic
     }
 
 
-def calc_bollinger(candles: list, period: int = 20, std_dev: float = 2.0) -> dict:
+def calc_bollinger(candles: list, period: int = 10, std_dev: float = 1.5) -> dict:
     closes = [c.close for c in candles]
     if len(closes) < period:
         return {"upper": 0.0, "middle": 0.0, "lower": 0.0, "bandwidth": 0.0, "position": "MEIO"}

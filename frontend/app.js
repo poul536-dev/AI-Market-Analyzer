@@ -1,5 +1,5 @@
 const API_BASE = "";
-const REFRESH_MS = 3000;
+const REFRESH_MS = 1000;
 const CIRCUMFERENCE = 2 * Math.PI * 26;
 
 function $(id) { return document.getElementById(id); }

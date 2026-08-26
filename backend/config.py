@@ -17,18 +17,20 @@ class MT5Config:
 
 @dataclass
 class ScoreWeights:
-    vwap: float = 0.12
-    trend: float = 0.10
-    moving_averages: float = 0.10
-    momentum: float = 0.10
-    volume: float = 0.05
-    breakout: float = 0.05
-    structure: float = 0.05
+    vwap: float = 0.08
+    trend: float = 0.05
+    moving_averages: float = 0.05
+    momentum: float = 0.08
+    volume: float = 0.03
+    breakout: float = 0.03
+    structure: float = 0.03
     relative_strength: float = 0.05
-    adx: float = 0.08
-    stochastic: float = 0.05
-    bollinger: float = 0.05
-    recent_price: float = 0.10
+    adx: float = 0.05
+    stochastic: float = 0.03
+    bollinger: float = 0.03
+    recent_price: float = 0.18
+    tick_momentum: float = 0.22
+    price_velocity: float = 0.10
 
 
 @dataclass
@@ -37,16 +39,18 @@ class AssetConfig:
     base_price_wdo: float = 5203.50
     tick_size_win: float = 5.0
     tick_size_wdo: float = 0.50
-    ema_fast: int = 9
-    ema_slow: int = 21
-    sma_medium: int = 50
-    sma_long: int = 200
-    rsi_period: int = 14
-    macd_fast: int = 12
-    macd_slow: int = 26
-    macd_signal: int = 9
-    roc_period: int = 10
-    update_interval_seconds: int = 3
+    ema_fast: int = 3
+    ema_slow: int = 8
+    sma_medium: int = 21
+    sma_long: int = 50
+    rsi_period: int = 7
+    macd_fast: int = 5
+    macd_slow: int = 13
+    macd_signal: int = 5
+    roc_period: int = 5
+    update_interval_seconds: int = 1
+    candle_timeframe: str = "M1"
+    candle_count: int = 100
 
 
 @dataclass

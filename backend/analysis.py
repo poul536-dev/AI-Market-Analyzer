@@ -31,6 +31,8 @@ class AssetAnalysis:
     resist_strength: str
     recent_change_pct: float = 0.0
     recent_momentum: str = "NEUTRO"
+    tick_momentum: float = 50.0
+    price_velocity: float = 0.0
 
 
 def _determine_trend(ind: FullIndicators, price: float) -> str:
@@ -115,6 +117,9 @@ def analyze_asset(asset: str, data: dict, indicators: FullIndicators) -> AssetAn
 
     recent_change_pct = 0.0
     recent_momentum = "NEUTRO"
+    tick_momentum = 50.0
+    price_velocity = 0.0
+
     if len(candles) >= 5:
         last5_close = [c.close for c in candles[-5:]]
         avg_last5 = sum(last5_close) / len(last5_close)
@@ -128,6 +133,22 @@ def analyze_asset(asset: str, data: dict, indicators: FullIndicators) -> AssetAn
                 recent_momentum = "SUBIDA FORTE"
             elif recent_change_pct > 0.1:
                 recent_momentum = "SUBIDA"
+
+    if len(candles) >= 10:
+        c10 = [c.close for c in candles[-10:]]
+        diffs = [c10[i] - c10[i - 1] for i in range(1, len(c10))]
+        if diffs:
+            up = sum(1 for d in diffs if d > 0)
+            down = sum(1 for d in diffs if d < 0)
+            total = len(diffs)
+            tick_momentum = round((up / total) * 100, 1) if total > 0 else 50.0
+
+    if len(candles) >= 3:
+        c3 = [c.close for c in candles[-3:]]
+        velocity_sum = 0
+        for i in range(1, len(c3)):
+            velocity_sum += (c3[i] - c3[i - 1])
+        price_velocity = round(velocity_sum / (len(c3) - 1), 2) if len(c3) > 1 else 0.0
 
     trend = _determine_trend(indicators, price)
     trend_strength = round(abs(variation_pct) * 10, 2)
@@ -178,6 +199,8 @@ def analyze_asset(asset: str, data: dict, indicators: FullIndicators) -> AssetAn
         resist_strength=resist_strength,
         recent_change_pct=recent_change_pct,
         recent_momentum=recent_momentum,
+        tick_momentum=tick_momentum,
+        price_velocity=price_velocity,
     )
 
 
