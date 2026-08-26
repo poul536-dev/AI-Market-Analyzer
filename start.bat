@@ -15,7 +15,7 @@ timeout /t 1 /nobreak >nul
 
 :: Start server
 echo Iniciando servidor...
-start /min cmd /c "cd /d "%~dp0backend" && py -m uvicorn main:app --host 127.0.0.1 --port 8000"
+start /min cmd /c "cd /d "%~dp0backend" && py -m uvicorn main:app --host 0.0.0.0 --port 8000"
 
 :: Wait for server to be ready
 echo Aguardando servidor ficar pronto...

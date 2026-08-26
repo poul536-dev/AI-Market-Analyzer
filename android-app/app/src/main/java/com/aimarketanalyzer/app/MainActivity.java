@@ -1,6 +1,8 @@
 package com.aimarketanalyzer.app;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -15,8 +17,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -28,6 +32,10 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout errorLayout;
     private SwipeRefreshLayout swipeRefresh;
     private String serverUrl;
+    private SharedPreferences prefs;
+
+    private static final String PREFS_NAME = "AIMarketAnalyzer";
+    private static final String KEY_SERVER_URL = "server_url";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -41,7 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        serverUrl = getString(R.string.server_url);
+        prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        serverUrl = prefs.getString(KEY_SERVER_URL, getString(R.string.server_url));
 
         webView = findViewById(R.id.webview);
         progressBar = findViewById(R.id.progress_bar);
@@ -115,10 +124,68 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        webView.setOnLongClickListener(v -> {
+            showSettingsDialog();
+            return true;
+        });
+        webView.setLongClickable(true);
+
         if (isNetworkAvailable()) {
             webView.loadUrl(serverUrl);
         } else {
             showError();
+        }
+    }
+
+    private void showSettingsDialog() {
+        String[] options = {
+            "Cloud (Railway) - Sempre disponivel",
+            "Local (WiFi) - MT5 em tempo real",
+            "URL personalizada"
+        };
+
+        new AlertDialog.Builder(this, R.style.Theme_AIMarketAnalyzer)
+            .setTitle("Configurar Servidor")
+            .setItems(options, (dialog, which) -> {
+                switch (which) {
+                    case 0:
+                        setServerUrl("https://ai-market-analyzer-production.up.railway.app");
+                        break;
+                    case 1:
+                        setServerUrl("http://192.168.15.8:8000");
+                        break;
+                    case 2:
+                        showCustomUrlDialog();
+                        break;
+                }
+            })
+            .show();
+    }
+
+    private void showCustomUrlDialog() {
+        EditText input = new EditText(this);
+        input.setText(serverUrl);
+        input.setHint("http://192.168.x.x:8000");
+
+        new AlertDialog.Builder(this, R.style.Theme_AIMarketAnalyzer)
+            .setTitle("URL do Servidor")
+            .setView(input)
+            .setPositiveButton("Salvar", (dialog, which) -> {
+                String url = input.getText().toString().trim();
+                if (!url.isEmpty()) {
+                    setServerUrl(url);
+                }
+            })
+            .setNegativeButton("Cancelar", null)
+            .show();
+    }
+
+    private void setServerUrl(String url) {
+        serverUrl = url;
+        prefs.edit().putString(KEY_SERVER_URL, url).apply();
+        Toast.makeText(this, "Servidor: " + url, Toast.LENGTH_SHORT).show();
+        if (isNetworkAvailable()) {
+            webView.loadUrl(serverUrl);
         }
     }
 
