@@ -771,7 +771,8 @@ function updateMT5Status(data) {
 
 async function fetchData() {
     try {
-        const [analiseRes, cenariosRes, alertasRes, crossRes, mtfWinRes, mtfWdoRes, divWinRes, divWdoRes, sentRes, estratRes, riscoRes, perfRes, mt5Res, newsRes, newsResumRes, projWinRes, projWdoRes, accuracyRes, weightsRes, historyRes] = await Promise.all([
+        const [mercadoRes, analiseRes, cenariosRes, alertasRes, crossRes, mtfWinRes, mtfWdoRes, divWinRes, divWdoRes, sentRes, estratRes, riscoRes, perfRes, mt5Res, newsRes, newsResumRes, projWinRes, projWdoRes, accuracyRes, weightsRes, historyRes] = await Promise.all([
+            authFetch(API_BASE + "/mercado"),
             authFetch(API_BASE + "/analise"),
             authFetch(API_BASE + "/cenarios"),
             authFetch(API_BASE + "/alertas"),
@@ -794,6 +795,7 @@ async function fetchData() {
             authFetch(API_BASE + "/outcome/historico"),
         ]);
 
+        const mercado = await mercadoRes.json();
         const analise = await analiseRes.json();
         const cenarios = await cenariosRes.json();
         const alertasData = await alertasRes.json();
@@ -816,6 +818,8 @@ async function fetchData() {
         const historyData = await historyRes.json();
 
         setConnected(true);
+
+        setStatus(mercado.market_status === "ABERTO");
 
         const dataSource = analise.WIN ? (analise.WIN.source || "unknown") : "unknown";
         const sourceEl = $("data-source");

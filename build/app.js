@@ -661,7 +661,8 @@ el.style.color = "var(--red)";
 }
 async function fetchData() {
 try {
-const [analiseRes, cenariosRes, alertasRes, crossRes, mtfWinRes, mtfWdoRes, divWinRes, divWdoRes, sentRes, estratRes, riscoRes, perfRes, mt5Res, newsRes, newsResumRes, projWinRes, projWdoRes, accuracyRes, weightsRes, historyRes] = await Promise.all([
+const [mercadoRes, analiseRes, cenariosRes, alertasRes, crossRes, mtfWinRes, mtfWdoRes, divWinRes, divWdoRes, sentRes, estratRes, riscoRes, perfRes, mt5Res, newsRes, newsResumRes, projWinRes, projWdoRes, accuracyRes, weightsRes, historyRes] = await Promise.all([
+authFetch(API_BASE + "/mercado"),
 authFetch(API_BASE + "/analise"),
 authFetch(API_BASE + "/cenarios"),
 authFetch(API_BASE + "/alertas"),
@@ -683,6 +684,7 @@ authFetch(API_BASE + "/outcome/acuracia"),
 authFetch(API_BASE + "/outcome/pesos"),
 authFetch(API_BASE + "/outcome/historico"),
 ]);
+const mercado = await mercadoRes.json();
 const analise = await analiseRes.json();
 const cenarios = await cenariosRes.json();
 const alertasData = await alertasRes.json();
@@ -704,6 +706,7 @@ const accuracyData = await accuracyRes.json();
 const weightsData = await weightsRes.json();
 const historyData = await historyRes.json();
 setConnected(true);
+setStatus(mercado.market_status === "ABERTO");
 const dataSource = analise.WIN ? (analise.WIN.source || "unknown") : "unknown";
 const sourceEl = $("data-source");
 if (dataSource === "mt5_realtime") {
