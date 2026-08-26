@@ -29,6 +29,8 @@ class AssetAnalysis:
     rsi_zone: str
     support_strength: str
     resist_strength: str
+    recent_change_pct: float = 0.0
+    recent_momentum: str = "NEUTRO"
 
 
 def _determine_trend(ind: FullIndicators, price: float) -> str:
@@ -105,10 +107,27 @@ def analyze_asset(asset: str, data: dict, indicators: FullIndicators) -> AssetAn
     low = data["low"]
     volume = data["volume"]
     avg_volume = data["avg_volume"]
+    candles = data.get("candles", [])
 
     variation = round(price - open_price, 2)
     variation_pct = round((variation / abs(open_price)) * 100, 4) if open_price != 0 else 0.0
     volume_ratio = round(volume / avg_volume, 2) if avg_volume > 0 else 1.0
+
+    recent_change_pct = 0.0
+    recent_momentum = "NEUTRO"
+    if len(candles) >= 5:
+        last5_close = [c.close for c in candles[-5:]]
+        avg_last5 = sum(last5_close) / len(last5_close)
+        if avg_last5 > 0:
+            recent_change_pct = round(((price - avg_last5) / avg_last5) * 100, 4)
+            if recent_change_pct < -0.3:
+                recent_momentum = "QUEDA FORTE"
+            elif recent_change_pct < -0.1:
+                recent_momentum = "QUEDA"
+            elif recent_change_pct > 0.3:
+                recent_momentum = "SUBIDA FORTE"
+            elif recent_change_pct > 0.1:
+                recent_momentum = "SUBIDA"
 
     trend = _determine_trend(indicators, price)
     trend_strength = round(abs(variation_pct) * 10, 2)
@@ -157,6 +176,8 @@ def analyze_asset(asset: str, data: dict, indicators: FullIndicators) -> AssetAn
         rsi_zone=rsi_zone,
         support_strength=support_strength,
         resist_strength=resist_strength,
+        recent_change_pct=recent_change_pct,
+        recent_momentum=recent_momentum,
     )
 
 

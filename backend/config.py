@@ -17,17 +17,18 @@ class MT5Config:
 
 @dataclass
 class ScoreWeights:
-    vwap: float = 0.15
-    trend: float = 0.15
-    moving_averages: float = 0.12
-    momentum: float = 0.12
-    volume: float = 0.08
-    breakout: float = 0.08
+    vwap: float = 0.12
+    trend: float = 0.10
+    moving_averages: float = 0.10
+    momentum: float = 0.10
+    volume: float = 0.05
+    breakout: float = 0.05
     structure: float = 0.05
     relative_strength: float = 0.05
-    adx: float = 0.10
+    adx: float = 0.08
     stochastic: float = 0.05
     bollinger: float = 0.05
+    recent_price: float = 0.10
 
 
 @dataclass

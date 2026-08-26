@@ -19,8 +19,12 @@ def _score_vwap(analysis: AssetAnalysis) -> float:
     dist = abs(analysis.vwap_distance_pct)
 
     if pos == "ACIMA":
+        if dist > 0.5:
+            return min(100, 50 + dist * 80)
         return min(100, 50 + dist * 50)
     elif pos == "ABAIXO":
+        if dist > 0.5:
+            return max(0, 50 - dist * 80)
         return max(0, 50 - dist * 50)
     return 50.0
 
@@ -150,18 +154,27 @@ def _score_adx(analysis: AssetAnalysis) -> float:
     trend = analysis.trend
 
     if adx_val < 15:
+        if plus_di > minus_di:
+            return 60.0
+        elif minus_di > plus_di:
+            return 40.0
         return 50.0
 
     if trend == "ALTA":
         if plus_di > minus_di and adx_val > 25:
             return min(85, 50 + adx_val)
         elif minus_di > plus_di:
-            return max(15, 50 - adx_val)
+            return max(15, 50 - adx_val * 1.5)
     elif trend == "BAIXA":
         if minus_di > plus_di and adx_val > 25:
             return max(15, 50 - adx_val)
         elif plus_di > minus_di:
-            return min(85, 50 + adx_val)
+            return min(85, 50 + adx_val * 1.5)
+
+    if plus_di > minus_di:
+        return min(70, 50 + adx_val * 0.8)
+    elif minus_di > plus_di:
+        return max(30, 50 - adx_val * 0.8)
 
     return 50.0
 
@@ -200,6 +213,23 @@ def _score_bollinger(analysis: AssetAnalysis) -> float:
     return 50.0
 
 
+def _score_recent_price(analysis: AssetAnalysis) -> float:
+    rc = analysis.recent_change_pct
+    if rc < -0.5:
+        return 10.0
+    elif rc < -0.3:
+        return 20.0
+    elif rc < -0.1:
+        return 35.0
+    elif rc > 0.5:
+        return 90.0
+    elif rc > 0.3:
+        return 80.0
+    elif rc > 0.1:
+        return 65.0
+    return 50.0
+
+
 def calculate_score(analysis: AssetAnalysis) -> ScoreResult:
     w = settings.score_weights
 
@@ -215,6 +245,7 @@ def calculate_score(analysis: AssetAnalysis) -> ScoreResult:
         "adx": round(_score_adx(analysis), 1),
         "stochastic": round(_score_stochastic(analysis), 1),
         "bollinger": round(_score_bollinger(analysis), 1),
+        "recent_price": round(_score_recent_price(analysis), 1),
     }
 
     total_raw = (
@@ -229,6 +260,7 @@ def calculate_score(analysis: AssetAnalysis) -> ScoreResult:
         + components["adx"] * w.adx
         + components["stochastic"] * w.stochastic
         + components["bollinger"] * w.bollinger
+        + components["recent_price"] * getattr(w, "recent_price", 0.10)
     )
 
     total = max(0, min(100, round(total_raw)))
@@ -237,16 +269,16 @@ def calculate_score(analysis: AssetAnalysis) -> ScoreResult:
         label = "VENDA MUITO FORTE"
     elif total <= 40:
         label = "VENDA"
-    elif total <= 59:
+    elif total <= 49:
         label = "NEUTRO"
-    elif total <= 79:
+    elif total <= 65:
         label = "COMPRA"
     else:
         label = "COMPRA MUITO FORTE"
 
-    if total >= 60:
+    if total >= 55:
         force = "COMPRADORA"
-    elif total <= 40:
+    elif total <= 45:
         force = "VEDORA"
     else:
         force = "NEUTRA"
