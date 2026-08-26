@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Market Analyzer</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="header">
+<div class="header-left">
+<h1><span>AI</span> MARKET ANALYZER</h1>
+<div class="header-subtitle">Intelligent Market Analysis</div>
+</div>
+<div class="header-right">
+<div class="header-info">
+<span class="header-info-label">Horario</span>
+<span class="header-info-value" id="clock">--:--:--</span>
+</div>
+<div class="header-info">
+<span class="header-info-label">Status</span>
+<span class="status-badge status-closed" id="market-status">FECHADO</span>
+</div>
+<div class="header-info">
+<span class="header-info-label">Fonte</span>
+<span class="header-info-value" id="data-source">-</span>
+</div>
+<div class="header-info">
+<span class="header-info-label">Conexao</span>
+<span class="header-info-value" id="connection-status">
+<span class="connection-dot dot-disconnected" id="conn-dot"></span>
+<span id="conn-text">OFFLINE</span>
+</span>
+</div>
+<div class="header-info">
+<span class="header-info-label">MT5</span>
+<span class="header-info-value" id="mt5-status">-</span>
+</div>
+<div class="header-info">
+<span class="header-info-label">Ultima Atualizacao</span>
+<span class="header-info-value" id="last-update">--:--:--</span>
+</div>
+<div class="header-info">
+<span class="header-info-label">Conta</span>
+<span class="header-info-value" id="user-info" style="cursor:pointer;color:#ef4444;" onclick="logout()">SAIR</span>
+</div>
+</div>
+</header>
+<div class="battle-arena" id="arena-win">
+<canvas class="arena-canvas arena-candles" id="candles-win"></canvas>
+<canvas class="arena-canvas arena-particles" id="particles-win"></canvas>
+<div class="arena-scene" id="win-scene">
+<div class="arena-side bull-side" id="win-bull-side">
+<div class="animal-info">
+<div class="animal-label bull-text">COMPRADORES</div>
+<div class="animal-power bull-text" id="win-bull-power">0%</div>
+</div>
+</div>
+<div class="arena-center">
+<div class="bar-wrapper">
+<div class="bar-track">
+<div class="bar-fill bar-fill-buy" id="win-bar-fill-buy"></div>
+<div class="bar-fill bar-fill-sell" id="win-bar-fill-sell"></div>
+<div class="bar-marker" id="win-battle-marker"></div>
+</div>
+<div class="bar-labels">
+<span class="bar-pct bull-text" id="win-pct-bull">0%</span>
+<span class="bar-vs">VS</span>
+<span class="bar-pct bear-text" id="win-pct-bear">0%</span>
+</div>
+</div>
+<div class="center-indicator" id="win-center-indicator">
+<span class="indicator-icon" id="win-indicator-icon">&#9878;</span>
+<span class="indicator-text" id="win-indicator-text">MERCADO EQUILIBRADO</span>
+</div>
+<div class="battle-signal" id="win-battle-signal">NEUTRO</div>
+</div>
+<div class="arena-side bear-side" id="win-bear-side">
+<div class="animal-info">
+<div class="animal-label bear-text">VENDEDORES</div>
+<div class="animal-power bear-text" id="win-bear-power">0%</div>
+</div>
+</div>
+</div>
+<div class="arena-footer">
+<div class="arena-stat"><span class="stat-label">ESTADO</span><span class="stat-value" id="win-market-state">EQUILIBRADO</span></div>
+<div class="arena-stat"><span class="stat-label">DIFERENCIAL</span><span class="stat-value" id="win-differential">0</span></div>
+<div class="arena-stat"><span class="stat-label">INTENSIDADE</span><span class="stat-value" id="win-intensity">BAIXA</span></div>
+</div>
+</div>
+<div class="battle-arena" id="arena-wdo">
+<canvas class="arena-canvas arena-candles" id="candles-wdo"></canvas>
+<canvas class="arena-canvas arena-particles" id="particles-wdo"></canvas>
+<div class="arena-scene" id="wdo-scene">
+<div class="arena-side bull-side" id="wdo-bull-side">
+<div class="animal-info">
+<div class="animal-label bull-text">COMPRADORES</div>
+<div class="animal-power bull-text" id="wdo-bull-power">0%</div>
+</div>
+</div>
+<div class="arena-center">
+<div class="bar-wrapper">
+<div class="bar-track">
+<div class="bar-fill bar-fill-buy" id="wdo-bar-fill-buy"></div>
+<div class="bar-fill bar-fill-sell" id="wdo-bar-fill-sell"></div>
+<div class="bar-marker" id="wdo-battle-marker"></div>
+</div>
+<div class="bar-labels">
+<span class="bar-pct bull-text" id="wdo-pct-bull">0%</span>
+<span class="bar-vs">VS</span>
+<span class="bar-pct bear-text" id="wdo-pct-bear">0%</span>
+</div>
+</div>
+<div class="center-indicator" id="wdo-center-indicator">
+<span class="indicator-icon" id="wdo-indicator-icon">&#9878;</span>
+<span class="indicator-text" id="wdo-indicator-text">MERCADO EQUILIBRADO</span>
+</div>
+<div class="battle-signal" id="wdo-battle-signal">NEUTRO</div>
+</div>
+<div class="arena-side bear-side" id="wdo-bear-side">
+<div class="animal-info">
+<div class="animal-label bear-text">VENDEDORES</div>
+<div class="animal-power bear-text" id="wdo-bear-power">0%</div>
+</div>
+</div>
+</div>
+<div class="arena-footer">
+<div class="arena-stat"><span class="stat-label">ESTADO</span><span class="stat-value" id="wdo-market-state">EQUILIBRADO</span></div>
+<div class="arena-stat"><span class="stat-label">DIFERENCIAL</span><span class="stat-value" id="wdo-differential">0</span></div>
+<div class="arena-stat"><span class="stat-label">INTENSIDADE</span><span class="stat-value" id="wdo-intensity">BAIXA</span></div>
+</div>
+</div>
+<main class="main">
+<div class="row">
+<div class="card" id="card-win">
+<div class="card-header">
+<span class="card-title">WIN - Mini Indice</span>
+<span class="card-badge badge-neutral" id="win-badge">NEUTRO</span>
+</div>
+<div class="price-row">
+<span class="price-main" id="win-price">0</span>
+<span class="price-variation" id="win-variation">0 (0.00%)</span>
+</div>
+<div class="score-section">
+<div class="score-circle">
+<svg width="64" height="64" viewBox="0 0 64 64">
+<circle class="score-circle-bg" cx="32" cy="32" r="26"></circle>
+<circle class="score-circle-fill" id="win-score-circle" cx="32" cy="32" r="26"
+stroke-dasharray="163.36" stroke-dashoffset="163.36"></circle>
+</svg>
+<span class="score-value" id="win-score">0</span>
+</div>
+<div class="score-info">
+<span class="score-label" id="win-score-label">NEUTRO</span>
+<span class="score-sublabel">Score / 100</span>
+</div>
+</div>
+<div class="force-bar-container">
+<div class="force-bar-label">
+<span>Forca</span>
+<span id="win-force-text">NEUTRA</span>
+</div>
+<div class="force-bar">
+<div class="force-bar-fill" id="win-force-bar" style="width:50%;background:var(--yellow)"></div>
+</div>
+</div>
+<div class="indicator-grid" id="win-indicators"></div>
+</div>
+<div class="card" id="card-wdo">
+<div class="card-header">
+<span class="card-title">WDO - Mini Dolar</span>
+<span class="card-badge badge-neutral" id="wdo-badge">NEUTRO</span>
+</div>
+<div class="price-row">
+<span class="price-main" id="wdo-price">0</span>
+<span class="price-variation" id="wdo-variation">0 (0.00%)</span>
+</div>
+<div class="score-section">
+<div class="score-circle">
+<svg width="64" height="64" viewBox="0 0 64 64">
+<circle class="score-circle-bg" cx="32" cy="32" r="26"></circle>
+<circle class="score-circle-fill" id="wdo-score-circle" cx="32" cy="32" r="26"
+stroke-dasharray="163.36" stroke-dashoffset="163.36"></circle>
+</svg>
+<span class="score-value" id="wdo-score">0</span>
+</div>
+<div class="score-info">
+<span class="score-label" id="wdo-score-label">NEUTRO</span>
+<span class="score-sublabel">Score / 100</span>
+</div>
+</div>
+<div class="force-bar-container">
+<div class="force-bar-label">
+<span>Forca</span>
+<span id="wdo-force-text">NEUTRA</span>
+</div>
+<div class="force-bar">
+<div class="force-bar-fill" id="wdo-force-bar" style="width:50%;background:var(--yellow)"></div>
+</div>
+</div>
+<div class="indicator-grid" id="wdo-indicators"></div>
+</div>
+</div>
+<div class="row">
+<div class="card win-wdo-card">
+<div class="card-header">
+<span class="card-title">RELACAO WIN x WDO</span>
+<span class="card-badge badge-neutral" id="winwdo-badge">ANALISANDO</span>
+</div>
+<div class="win-wdo-grid">
+<div class="win-wdo-box">
+<h4>WIN</h4>
+<div class="win-wdo-row"><span class="label">Forca</span><span class="value" id="ww-win-forca">-</span></div>
+<div class="win-wdo-row"><span class="label">Score</span><span class="value" id="ww-win-score">-</span></div>
+<div class="win-wdo-row"><span class="label">Tendencia</span><span class="value" id="ww-win-trend">-</span></div>
+<div class="win-wdo-row"><span class="label">Momentum</span><span class="value" id="ww-win-momentum">-</span></div>
+</div>
+<div class="win-wdo-box">
+<h4>WDO</h4>
+<div class="win-wdo-row"><span class="label">Forca</span><span class="value" id="ww-wdo-forca">-</span></div>
+<div class="win-wdo-row"><span class="label">Score</span><span class="value" id="ww-wdo-score">-</span></div>
+<div class="win-wdo-row"><span class="label">Tendencia</span><span class="value" id="ww-wdo-trend">-</span></div>
+<div class="win-wdo-row"><span class="label">Momentum</span><span class="value" id="ww-wdo-momentum">-</span></div>
+</div>
+<div class="win-wdo-box cross-box">
+<h4>LEITURA CRUZADA</h4>
+<div class="win-wdo-row"><span class="label">Correlacao</span><span class="value" id="ww-correlation">-</span></div>
+<div class="win-wdo-row"><span class="label">Divergencia</span><span class="value" id="ww-divergence">-</span></div>
+<div class="win-wdo-row"><span class="label">Spread</span><span class="value" id="ww-spread">-</span></div>
+<div class="win-wdo-row"><span class="label">Pressao WDO</span><span class="value" id="ww-wdo-pressure">-</span></div>
+<div class="win-wdo-row"><span class="label">Recomendacao</span><span class="value" id="ww-recommendation">-</span></div>
+</div>
+</div>
+</div>
+</div>
+<div class="row">
+<div class="card">
+<div class="card-header">
+<span class="card-title">MULTITIMEFRAME - WIN</span>
+<span class="card-badge badge-neutral" id="mtf-win-badge">-</span>
+</div>
+<div class="mtf-grid" id="mtf-win"></div>
+</div>
+<div class="card">
+<div class="card-header">
+<span class="card-title">MULTITIMEFRAME - WDO</span>
+<span class="card-badge badge-neutral" id="mtf-wdo-badge">-</span>
+</div>
+<div class="mtf-grid" id="mtf-wdo"></div>
+</div>
+</div>
+<div class="row">
+<div class="card">
+<div class="card-header">
+<span class="card-title">DIVERGENCIAS - WIN</span>
+</div>
+<div class="divergence-list" id="div-win"></div>
+</div>
+<div class="card">
+<div class="card-header">
+<span class="card-title">DIVERGENCIAS - WDO</span>
+</div>
+<div class="divergence-list" id="div-wdo"></div>
+</div>
+</div>
+<div class="row">
+<div class="card ai-box">
+<div class="card-header">
+<span class="card-title">AI MARKET ENGINE</span>
+<span class="card-badge badge-buy" id="ai-badge">LEITURA</span>
+</div>
+<div class="ai-text" id="ai-text">Aguardando analise do mercado...</div>
+</div>
+</div>
+<div class="row">
+<div class="card sentiment-card">
+<div class="card-header">
+<span class="card-title">SENTIMENTO DE MERCADO</span>
+<span class="card-badge badge-neutral" id="sentiment-badge">-</span>
+</div>
+<div class="sentiment-score" id="sentiment-score">50</div>
+<div class="sentiment-label" id="sentiment-label">Neutro</div>
+<div class="sentiment-interpretation" id="sentiment-interpretation">Aguardando dados...</div>
+<div class="sentiment-factors" id="sentiment-factors"></div>
+</div>
+<div class="card">
+<div class="card-header">
+<span class="card-title">ESTRATEGIAS</span>
+</div>
+<div class="strategy-list" id="strategy-list"></div>
+</div>
+</div>
+<div class="row">
+<div class="card risk-card">
+<div class="card-header">
+<span class="card-title">GERENCIAMENTO DE RISCO</span>
+</div>
+<div class="risk-grid" id="risk-grid"></div>
+</div>
+<div class="card">
+<div class="card-header">
+<span class="card-title">PERFORMANCE</span>
+</div>
+<div class="perf-grid" id="perf-grid"></div>
+</div>
+</div>
+<div class="row">
+<div class="card" id="cenario-win">
+<div class="card-header">
+<span class="card-title">CENARIOS - WIN</span>
+</div>
+<div class="scenario-grid" id="cenarios-win"></div>
+</div>
+<div class="card" id="cenario-wdo">
+<div class="card-header">
+<span class="card-title">CENARIOS - WDO</span>
+</div>
+<div class="scenario-grid" id="cenarios-wdo"></div>
+</div>
+</div>
+<div class="row">
+<div class="card mapa-card">
+<div class="card-header">
+<span class="card-title">MAPA OPERACIONAL</span>
+</div>
+<div class="mapa-grid" id="mapa-grid"></div>
+</div>
+</div>
+<div class="row">
+<div class="card">
+<div class="card-header">
+<span class="card-title">ALERTAS</span>
+<span class="card-badge badge-neutral" id="alerts-count">0</span>
+</div>
+<div class="alerts-list" id="alerts-list"></div>
+</div>
+</div>
+<div class="row">
+<div class="card news-sentiment-card">
+<div class="card-header">
+<span class="card-title">SENTIMENTO NOTICIAS</span>
+<span class="card-badge badge-neutral" id="news-sent-badge">-</span>
+</div>
+<div class="news-sent-score" id="news-sent-score">0</div>
+<div class="news-sent-label" id="news-sent-label">Carregando...</div>
+<div class="news-sent-counts" id="news-sent-counts"></div>
+<div class="news-top-list" id="news-top-positive"></div>
+<div class="news-top-list" id="news-top-negative"></div>
+</div>
+<div class="card projecao-card">
+<div class="card-header">
+<span class="card-title">PROJECAO CRUZADA - WIN</span>
+<span class="card-badge badge-neutral" id="proj-win-badge">-</span>
+</div>
+<div class="projecao-combined" id="proj-win-combined">0</div>
+<div class="projecao-signal" id="proj-win-signal">-</div>
+<div class="projecao-factors" id="proj-win-factors"></div>
+</div>
+<div class="card projecao-card">
+<div class="card-header">
+<span class="card-title">PROJECAO CRUZADA - WDO</span>
+<span class="card-badge badge-neutral" id="proj-wdo-badge">-</span>
+</div>
+<div class="projecao-combined" id="proj-wdo-combined">0</div>
+<div class="projecao-signal" id="proj-wdo-signal">-</div>
+<div class="projecao-factors" id="proj-wdo-factors"></div>
+</div>
+</div>
+<div class="row">
+<div class="card accuracy-card">
+<div class="card-header">
+<span class="card-title">ACURACIA IA</span>
+<span class="card-badge badge-neutral" id="accuracy-badge">-</span>
+</div>
+<div class="accuracy-grid" id="accuracy-main"></div>
+<div class="accuracy-components" id="accuracy-components"></div>
+</div>
+<div class="card weights-card">
+<div class="card-header">
+<span class="card-title">PESOS AUTO-TUNE</span>
+<span class="card-badge badge-neutral" id="weights-badge">-</span>
+</div>
+<div class="weights-grid" id="weights-grid"></div>
+</div>
+<div class="card history-card">
+<div class="card-header">
+<span class="card-title">HISTORICO PREVISOES</span>
+<span class="card-badge badge-neutral" id="history-count">0</span>
+</div>
+<div class="history-list" id="outcome-history"></div>
+</div>
+</div>
+<div class="row">
+<div class="card news-feed-card">
+<div class="card-header">
+<span class="card-title">FEED NOTICIAS TEMPO REAL</span>
+<span class="card-badge badge-neutral" id="news-count-badge">0</span>
+</div>
+<div class="news-feed" id="news-feed"></div>
+</div>
+</div>
+</main>
+<footer class="footer">
+AI Market Analyzer v4.0 - Dados de mercados globais via Yahoo Finance - Nao constitui recomendacao de investimento
+</footer>
+<script src="/static/battle-engine.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

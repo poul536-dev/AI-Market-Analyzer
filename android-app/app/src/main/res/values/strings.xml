@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AI Market Analyzer</string>
+    <string name="app_subtitle">Day Trade B3 - WIN / WDO</string>
+
+    <!--
+        CONFIGURE SERVER URL HERE:
+        - After deploying to Railway, paste your URL below
+        - Example: https://ai-market-analyzer.up.railway.app
+        - For local testing on same WiFi: http://192.168.X.X:8000
+        - For Android emulator: http://10.0.2.2:8000
+    -->
+    <string name="server_url">https://ai-market-analyzer.up.railway.app</string>
+
+    <!-- Error messages -->
+    <string name="error_title">Sem conexao</string>
+    <string name="error_message">Verifique sua conexao com a internet e tente novamente.</string>
+    <string name="retry">Tentar Novamente</string>
+</resources>
