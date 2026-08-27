@@ -309,6 +309,53 @@ return '<div class="alert-item ' + sevClass + '">' +
 '</div>';
 }).join("");
 }
+function updateCalendar(cal) {
+const badge = $("cal-badge");
+const inflEl = $("cal-influence");
+const evEl = $("cal-events");
+if (!cal || !cal.available) {
+badge.textContent = "INDISPONIVEL";
+inflEl.innerHTML = '<div class="cal-infl-box"><span class="cal-label">Calendario</span><span class="cal-value">Sem dados</span></div>';
+evEl.innerHTML = "";
+return;
+}
+const watchCount = (cal.watch_events || []).length;
+badge.textContent = cal.high_impact_count > 0
+? (cal.high_impact_count + " ALTO IMPACTO")
+: (cal.highlight_count + " EVENTOS");
+const influWin = (cal.influence_win || 0);
+const influWdo = (cal.influence_wdo || 0);
+const winColor = influWin > 0 ? "var(--green)" : influWin < 0 ? "var(--red)" : "var(--text-secondary)";
+const wdoColor = influWdo > 0 ? "var(--green)" : influWdo < 0 ? "var(--red)" : "var(--text-secondary)";
+inflEl.innerHTML =
+'<div class="cal-infl-box"><span class="cal-label">Influencia WIN</span><span class="cal-value" style="color:' + winColor + '">' + (influWin > 0 ? "+" : "") + influWin + '</span></div>' +
+'<div class="cal-infl-box"><span class="cal-label">Influencia WDO</span><span class="cal-value" style="color:' + wdoColor + '">' + (influWdo > 0 ? "+" : "") + influWdo + '</span></div>' +
+'<div class="cal-infl-box"><span class="cal-label">Eventos em alerta</span><span class="cal-value">' + watchCount + '</span></div>' +
+'<div class="cal-note">' + (cal.note || "") + '</div>';
+evEl.innerHTML = (cal.watch_events || []).map(function(e) {
+const imp = e.impact ? e.impact.toLowerCase() : "low";
+const eff = e.effect || {};
+const wdoEff = eff.wdo || 0;
+const winEff = eff.win || 0;
+return '<div class="cal-event ' + imp + '">' +
+'<span class="cal-event-time">' + formatCalTime(e.time) + '</span>' +
+'<span class="cal-event-title">' + (e.label || e.title) + '</span>' +
+'<span class="cal-event-country">' + e.country + '</span>' +
+'<span class="cal-event-impact ' + imp + '">' + (e.impact || "low") + '</span>' +
+'<span class="cal-event-effect">WIN ' + (winEff > 0 ? "+" : "") + winEff + ' | WDO ' + (wdoEff > 0 ? "+" : "") + wdoEff + '</span>' +
+'</div>';
+}).join("") || '<div class="cal-note">Nenhum evento de destaque hoje.</div>';
+}
+function formatCalTime(timeStr) {
+if (!timeStr) return "--:--";
+const m = timeStr.match(/(\d+):(\d+)\s*([ap]m)?/i);
+if (!m) return timeStr;
+let h = parseInt(m[1], 10);
+const min = m[2];
+if (m[3] && m[3].toLowerCase() === "pm" && h < 12) h += 12;
+if (m[3] && m[3].toLowerCase() === "am" && h === 12) h = 0;
+return String(h).padStart(2, "0") + ":" + min;
+}
 function updateNewsSentiment(data) {
 if (!data) return;
 const score = data.score || 0;
@@ -760,6 +807,11 @@ updateStrategies(estratData);
 updateRisk(riscoData);
 updatePerformance(perfData);
 updateAlerts(alertasData.alerts);
+if (analise._calendar && analise._calendar.calendar) {
+updateCalendar(analise._calendar.calendar);
+} else {
+updateCalendar(null);
+}
 updateNewsSentiment(newsResumo);
 updateProjection("WIN", projWin);
 updateProjection("WDO", projWdo);

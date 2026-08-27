@@ -313,6 +313,91 @@ body {
     gap: 20px;
 }
 
+.alerts-top-row {
+    padding: 20px;
+    background: var(--bg-primary);
+}
+
+.calendar-influence {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.cal-infl-box {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    min-width: 120px;
+}
+.cal-infl-box .cal-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.cal-infl-box .cal-value {
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 4px;
+}
+.cal-note {
+    flex-basis: 100%;
+    font-size: 12px;
+    color: var(--yellow);
+    margin-top: 4px;
+}
+.calendar-events {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.cal-event {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    border-left: 3px solid var(--border);
+}
+.cal-event.high { border-left-color: #ef4444; }
+.cal-event.medium { border-left-color: #f59e0b; }
+.cal-event.low { border-left-color: var(--border); }
+.cal-event-time {
+    font-size: 12px;
+    color: var(--text-muted);
+    min-width: 70px;
+    font-weight: 700;
+}
+.cal-event-title {
+    flex: 1;
+    font-size: 13px;
+}
+.cal-event-country {
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 55px;
+    text-align: right;
+}
+.cal-event-impact {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
+.cal-event-impact.high { background: rgba(239,68,68,0.2); color: #ef4444; }
+.cal-event-impact.medium { background: rgba(245,158,11,0.2); color: #f59e0b; }
+.cal-event-impact.low { background: rgba(148,163,184,0.2); color: var(--text-muted); }
+.cal-event-effect {
+    font-size: 11px;
+    min-width: 60px;
+    text-align: right;
+    font-weight: 600;
+}
+
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border);

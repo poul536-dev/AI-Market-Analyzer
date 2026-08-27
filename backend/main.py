@@ -49,6 +49,7 @@ from sentiment import MarketSentiment
 from news import NewsAnalyzer
 from outcome_tracker import OutcomeTracker
 from auto_tune import AutoTuner
+from economic_calendar import calendar_engine, calendar_influence
 
 
 async def _background_prediction_loop():
@@ -236,12 +237,26 @@ def get_analise():
             wdo_influence_on_win = cross_data.get("wdo_influence", 0.0)
             wdo_score_val = cross_data.get("wdo_score", 50.0)
 
+    cal_data = calendar_influence()
+    cal_influence_win = cal_data.get("influence_win", 0.0)
+    cal_influence_wdo = cal_data.get("influence_wdo", 0.0)
+    cal_prob_win = cal_data.get("probability_adjust_win", 0.0)
+    cal_prob_wdo = cal_data.get("probability_adjust_wdo", 0.0)
+
     for asset_name, analysis in results.items():
         if asset_name == "WIN":
-            score = calculate_score(analysis, wdo_influence=wdo_influence_on_win, wdo_score=wdo_score_val)
+            score = calculate_score(
+                analysis,
+                wdo_influence=wdo_influence_on_win,
+                wdo_score=wdo_score_val,
+                cal_influence=cal_influence_win,
+            )
+        elif asset_name == "WDO":
+            score = calculate_score(analysis, cal_influence=cal_influence_wdo)
         else:
             score = calculate_score(analysis)
-        prob = calculate_probability(analysis, score)
+        cal_adj = cal_prob_win if asset_name == "WIN" else cal_prob_wdo
+        prob = calculate_probability(analysis, score, cal_adjust=cal_adj)
         ind = analysis.indicators
         sr = ind.sr
 
@@ -297,11 +312,20 @@ def get_analise():
             "day_low": sr.get("day_low", 0),
             "probability_up": prob["probability_up"],
             "probability_down": prob["probability_down"],
+            "cal_influence": round(
+                cal_influence_win if asset_name == "WIN" else cal_influence_wdo, 1
+            ),
+            "cal_adjust": round(
+                cal_adj, 1
+            ),
         }
 
     outcome_tracker.resolve_predictions(current_prices)
 
-    return output
+    summary = {
+        "calendar": cal_data,
+    }
+    return {**output, "_calendar": summary}
 
 
 @app.get("/analise/{asset}")
@@ -905,6 +929,25 @@ def get_noticias_projecao(asset: str):
         score=score.total,
         trend=analysis.trend,
     )
+
+
+@app.get("/calendario")
+def get_calendario(force: bool = False, limit: int = 15):
+    """Retorna o calendario economico do dia + influencia estimada no WIN/WDO."""
+    calendar_engine.refresh(force=force)
+    today_events = [e.to_dict() for e in calendar_engine.today()]
+    upcoming_raw = calendar_engine.next_upcoming(limit=limit)
+    upcoming = [e.to_dict() for e in upcoming_raw]
+    influence = calendar_influence()
+    return {
+        "available": influence["available"],
+        "refresh_seconds": 300,
+        "today_count": len(today_events),
+        "today": today_events,
+        "upcoming": upcoming,
+        "influence": influence,
+        "error": calendar_engine.error,
+    }
 
 
 @app.get("/outcome/acuracia")

@@ -265,7 +265,12 @@ def _score_price_velocity(analysis: AssetAnalysis) -> float:
     return 50.0
 
 
-def calculate_score(analysis: AssetAnalysis, wdo_influence: float = 0.0, wdo_score: float = 50.0) -> ScoreResult:
+def calculate_score(
+    analysis: AssetAnalysis,
+    wdo_influence: float = 0.0,
+    wdo_score: float = 50.0,
+    cal_influence: float = 0.0,
+) -> ScoreResult:
     w = settings.score_weights
 
     components = {
@@ -303,7 +308,9 @@ def calculate_score(analysis: AssetAnalysis, wdo_influence: float = 0.0, wdo_sco
     )
 
     wdo_weight = getattr(w, "wdo", 0.15)
-    total_raw_with_wdo = total_raw + wdo_influence + (wdo_score - 50) * wdo_weight
+    total_raw_with_wdo = (
+        total_raw + wdo_influence + (wdo_score - 50) * wdo_weight + cal_influence
+    )
     total = max(0, min(100, round(total_raw_with_wdo)))
 
     if total <= 20:
@@ -327,7 +334,9 @@ def calculate_score(analysis: AssetAnalysis, wdo_influence: float = 0.0, wdo_sco
     return ScoreResult(total=total, label=label, components=components, force=force)
 
 
-def calculate_probability(analysis: AssetAnalysis, score: ScoreResult) -> dict:
+def calculate_probability(
+    analysis: AssetAnalysis, score: ScoreResult, cal_adjust: float = 0.0
+) -> dict:
     base = score.total
     trend_bonus = 0
     if analysis.trend == "ALTA":
@@ -347,7 +356,7 @@ def calculate_probability(analysis: AssetAnalysis, score: ScoreResult) -> dict:
     elif analysis.momentum in ("FRACO", "MUITO FRACO"):
         momentum_bonus = -4
 
-    prob_up = base + trend_bonus + vwap_bonus + momentum_bonus
+    prob_up = base + trend_bonus + vwap_bonus + momentum_bonus + cal_adjust
     prob_up = max(5, min(95, prob_up))
     prob_down = 100 - prob_up
 
