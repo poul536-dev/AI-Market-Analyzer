@@ -27,7 +27,12 @@ start http://localhost:8000
 
 echo.
 echo ========================================
-echo   Servidor rodando em http://localhost:8000
+echo   Servidor rodando!
+echo.
+echo   PC:       http://localhost:8000
+echo   Celular:  http://192.168.15.8:8000
+echo   (mesma rede WiFi)
+echo.
 echo   Para parar, execute stop.bat
 echo ========================================
 echo.
